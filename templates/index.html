@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5G Congestion Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+        .footer {
+            margin-top: 50px;
+            padding: 10px;
+            text-align: center;
+            background-color: #222;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="text-center">5G Congestion Prediction</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <h4>Enter Network Parameters</h4>
+                    <form id="predict-form" action="/predict" method="post">
+                        <label>Packet Rate:</label>
+                        <input type="text" class="form-control" name="packet_rate" required>
+                        <label>Throughput:</label>
+                        <input type="text" class="form-control" name="throughput" required>
+                        <label>Length:</label>
+                        <input type="text" class="form-control" name="length" required>
+                        <br>
+                        <button type="submit" class="btn btn-primary w-100">Predict</button>
+                    </form>
+                    {% if prediction %}
+                    <h4 class="text-center mt-3" id="result">{{ prediction }}</h4>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <h4>About 5G Congestion</h4>
+                    <p>5G congestion occurs when network traffic exceeds capacity, causing delays and reduced performance. Factors include:</p>
+                    <ul>
+                        <li>High data demand</li>
+                        <li>Limited bandwidth</li>
+                        <li>Network interference</li>
+                        <li>Peak hour usage</li>
+                    </ul>
+                    <button class="btn btn-info w-100" id="learn-more">Learn More</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles Section -->
+        <div class="card mt-4 p-4">
+            <h4>Latest Articles on 5G Congestion</h4>
+            <ul>
+                <li><a href="https://www.5gamericas.org/5g-network-congestion/" target="_blank">How AI is Helping to Reduce 5G Congestion</a></li>
+                <li><a href="https://www.qualcomm.com/news/onq/2022/02/how-5g-improves-internet-speeds" target="_blank">Impact of 5G on Internet Speed & Latency</a></li>
+                <li><a href="https://www.cisco.com/c/en/us/solutions/enterprise-networks/network-congestion-management.html" target="_blank">Best Practices to Avoid Network Overload</a></li>
+            </ul>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="card mt-4 p-4">
+            <h4>Frequently Asked Questions</h4>
+            <button class="btn btn-secondary w-100" data-bs-toggle="collapse" data-bs-target="#faq1">What causes 5G congestion?</button>
+            <div id="faq1" class="collapse p-2">High network usage, interference, and limited bandwidth contribute to congestion.</div>
+            
+            <button class="btn btn-secondary w-100 mt-2" data-bs-toggle="collapse" data-bs-target="#faq2">How can 5G congestion be reduced?</button>
+            <div id="faq2" class="collapse p-2">Optimizing bandwidth, upgrading infrastructure, and using AI-based prediction models can help.</div>
+            
+            <button class="btn btn-secondary w-100 mt-2" data-bs-toggle="collapse" data-bs-target="#faq3">Does congestion affect 5G speed?</button>
+            <div id="faq3" class="collapse p-2">Yes, congestion slows down data transfer speeds and increases latency.</div>
+        </div>
+        <div class="card mt-4 p-4">
+            <h4>Congestion Trends</h4>
+            <canvas id="congestionChart"></canvas>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>5G Congestion Prediction System | © 2025</p>
+        </div>
+    </div>
+    <script>
+    
+        // Add smooth animation for FAQ buttons
+        $(".collapse").on("show.bs.collapse", function () {
+            $(this).prev().addClass("active");
+        });
+
+        $(".collapse").on("hide.bs.collapse", function () {
+            $(this).prev().removeClass("active");
+        });
+
+        // Redirect button for more info
+        $("#learn-more").click(function() {
+            window.open("https://www.5gamericas.org/5g-network-congestion/", "_blank");
+        });
+
+        // Fade in prediction result
+        $(document).ready(function() {
+            $("#result").hide().fadeIn(1000);
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    
+    
+    <script>
+        async function fetchData() {
+            const response = await fetch('/congestion-data');
+            const data = await response.json();
+    
+            const labels = data.map(item => item.time);
+            const congestionValues = data.map(item => item.congestion);
+            
+            const ctx = document.getElementById('congestionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Congestion Over Time',
+                        data: congestionValues,
+                        borderColor: 'red',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+        }
+    
+        // Load congestion trend graph on page load
+        fetchData();
+    </script>
+    
+
+</body>
+</html>
